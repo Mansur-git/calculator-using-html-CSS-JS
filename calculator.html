@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.1/math.min.js"></script>
+    <style>
+        /* General styling */
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f0f2f5 0%, #e0e5ec 100%);
+            overflow: hidden;
+        }
+
+        /* Calculator container */
+        .calculator-div {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            width: 340px;
+            max-width: 90%;
+            height: 600px; /* Adjusted height for new row of buttons */
+            border-radius: 25px;
+            padding: 25px;
+            background: #f9f9f9;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1),
+                        0 5px 10px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Display screen */
+        #calculator-display {
+            height: 80px;
+            font-size: 2.8rem;
+            text-align: right;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border-radius: 18px;
+            border: none;
+            background-color: #ecf0f3;
+            color: #333;
+            box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.08),
+                        inset -3px -3px 8px rgba(255, 255, 255, 0.7);
+            overflow: hidden;
+            /* white-space: nowrap; */
+            /* text-overflow: ellipsis; */
+        }
+
+        /* Buttons grid */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        /* Individual buttons */
+        .buttons button {
+            font-size: 1.8rem;
+            padding: 18px;
+            border: none;
+            border-radius: 18px;
+            background: #e9eff4;
+            color: #4a4a4a;
+            box-shadow: 6px 6px 12px #caced1,
+                        -6px -6px 12px #ffffff;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            outline: none;
+        }
+
+        /* Button hover state */
+        .buttons button:hover {
+            box-shadow: inset 3px 3px 8px #caced1,
+                        inset -3px -3px 8px #ffffff;
+            background: #e0e5eb;
+            color: #2c2c2c;
+            transform: translateY(1px);
+        }
+
+        /* Active/Clicked state */
+        .buttons button:active {
+            box-shadow: inset 2px 2px 5px #caced1,
+                        inset -2px -2px 5px #ffffff;
+            transform: translateY(2px);
+            font-size: 1.7rem;
+        }
+
+        /* Operator buttons */
+        .buttons button.operator {
+            background: #8aa7be;
+            color: #ffffff;
+            box-shadow: 6px 6px 12px #7a97ae,
+                        -6px -6px 12px #9ac5ce;
+        }
+
+        .buttons button.operator:hover {
+            background: #6f93ac;
+            box-shadow: inset 3px 3px 8px #5c7b94,
+                        inset -3px -3px 8px #82a8c0;
+        }
+
+        /* Clear button */
+        .buttons button#clear {
+            background: #d15a5a;
+            box-shadow: 6px 6px 12px #b04949,
+                        -6px -6px 12px #f26b6b;
+        }
+
+        .buttons button#clear:hover {
+            background: #bc4b4b;
+            box-shadow: inset 3px 3px 8px #9e3d3d,
+                        inset -3px -3px 8px #e05c5c;
+        }
+
+        /* Equals button */
+        .buttons button#equals {
+            background: #5cb85c;
+            box-shadow: 6px 6px 12px #4a9e4a,
+                        -6px -6px 12px #6ed16e;
+        }
+
+        .buttons button#equals:hover {
+            background: #4a9e4a;
+            box-shadow: inset 3px 3px 8px #3c823c,
+                        inset -3px -3px 8px #5cd15c;
+        }
+
+        .buttons button#decimal,
+        .buttons button#delete,
+        .buttons button#power {
+            background: #a9a9a9; /* A neutral gray for these new utility buttons */
+            color: #ffffff;
+            box-shadow: 6px 6px 12px #8d8d8d,
+                        -6px -6px 12px #c5c5c5;
+        }
+
+        .buttons button#decimal:hover,
+        .buttons button#delete:hover,
+        .buttons button#power:hover {
+            background: #909090;
+            box-shadow: inset 3px 3px 8px #7c7c7c,
+                        inset -3px -3px 8px #b1b1b1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-div">
+        <div id="calculator-display"></div>
+
+        <div class="buttons">
+            <button class="number show">7</button>
+            <button class="number show">8</button>
+            <button class="number show">9</button>
+            <button class="operator show">/</button>
+
+            <button class="number show">4</button>
+            <button class="number show">5</button>
+            <button class="number show">6</button>
+            <button class="operator show">*</button>
+
+            <button class="number show">1</button>
+            <button class="number show">2</button>
+            <button class="number show">3</button>
+            <button class="operator show">-</button>
+
+            <button id="decimal" class="show">.</button> <button class="number show">0</button>
+            <button id="power" class="show">^</button> <button class="operator show">+</button>
+
+            <button id="clear">C</button>
+            <button id="delete">DEL</button> <button id="equals" style="grid-column: span 2;">=</button> </div>
+    </div>
+    <script>
+        const display = document.getElementById('calculator-display')
+        // display the input
+
+        const nums = document.getElementsByClassName('show');
+        Array.from(nums).forEach((ele)=>{
+            ele.addEventListener('click',()=>{
+                display.textContent+=ele.textContent
+            })
+        })
+        
+        // process the input
+
+       equals.addEventListener('click', () => {
+        try {
+            display.textContent = math.evaluate(display.textContent)
+        } 
+        catch (error) {
+            display.textContent = 'Error'
+        }
+        })
+
+        const clear = document.getElementById('clear')
+        clear.addEventListener('click',()=>{
+            display.textContent = ''
+        })
+        
+        const del = document.getElementById('delete')
+        del.addEventListener('click',()=>{
+            display.textContent = display.textContent.slice(0,-1)
+        })
+    </script>
+</body>
+</html>
